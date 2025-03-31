@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Digital Garden 🌸🌷🌻</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #8bc34a;
+        }
+        .emoji {
+            position: absolute;
+            font-size: 30px;
+            pointer-events: none;
+            animation: grow 0.5s ease-out;
+        }
+        @keyframes grow {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        h1 {
+            text-align: center;
+            font-family: 'Indie Flower', cursive;
+            margin-top: 20px;
+            color: #fff;
+            font-size: 36px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Plant Your Digital Garden 🌸🌷🌻</h1>
+
+    <script>
+        const emojis = [
+            "🌸", "🌷", "🌻", "🌺", "🌹", "🌼", "🥀", "🪻", "🪷", "🪴", "🌲", 
+            "🦋", "🐝", "🐛", "🐞"
+        ];
+
+        document.addEventListener('click', plantEmoji);
+
+        function plantEmoji(event) {
+            const emoji = document.createElement('div');
+            emoji.className = 'emoji';
+            emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+
+            const x = event.clientX;
+            const y = event.clientY;
+
+            emoji.style.position = 'absolute';
+            emoji.style.left = `${x}px`;
+            emoji.style.top = `${y}px`;
+            document.body.appendChild(emoji);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Photo Booth 📸</title>
+    <style>
+       
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Arial", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(to right, #f8cdda, #1d2b64);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #ff5e57;
+        }
+
+        .upload-section {
+            margin-bottom: 20px;
+        }
+
+        .upload-btn {
+            background: #ff5e57;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .booth {
+            border: 5px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            width: 300px;
+            height: 400px;
+            margin: 0 auto 20px;
+        }
+
+        .photo-frame {
+            width: 100%;
+            height: 100%;
+            background: url('placeholder.jpg') center/cover no-repeat;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .filter-options {
+            margin-top: 20px;
+        }
+
+        .filter-buttons button {
+            background: #ff5e57;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .filter-buttons button:hover {
+            background: #e04e47;
+        }
+
+        .download {
+            margin-top: 20px;
+        }
+
+        .download-btn {
+            background: #1dd1a1;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .download-btn:hover {
+            background: #10ac84;
+        }
+
+     
+        #photo.none {
+            filter: none;
+        }
+
+        #photo.grayscale {
+            filter: grayscale(100%);
+        }
+
+        #photo.sepia {
+            filter: sepia(100%);
+        }
+
+        #photo.blur {
+            filter: blur(3px);
+        }
+
+        #photo.invert {
+            filter: invert(100%);
+        }
+
+        #photo.vintage {
+            filter: contrast(1.2) brightness(0.9) sepia(0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📸 Retro Photo Booth 🎞️</h1>
+
+       
+        <div class="upload-section">
+            <label for="fileInput" class="upload-btn">Upload Your Photo</label>
+            <input type="file" id="fileInput" accept="image/*" />
+        </div>
+
+        
+        <div class="booth">
+            <div class="photo-frame">
+                <img src="placeholder.jpg" alt="Your Photo" id="photo" />
+            </div>
+        </div>
+
+       
+        <div class="filter-options">
+            <label>Select a Filter:</label>
+            <div class="filter-buttons">
+                <button onclick="applyFilter('none')">None</button>
+                <button onclick="applyFilter('grayscale')">Grayscale</button>
+                <button onclick="applyFilter('sepia')">Sepia</button>
+                <button onclick="applyFilter('blur')">Blur</button>
+                <button onclick="applyFilter('invert')">Invert</button>
+                <button onclick="applyFilter('vintage')">Vintage</button>
+            </div>
+        </div>
+
+      
+        <div class="download">
+            <a id="downloadBtn" class="download-btn" download="photo-booth.png">Download Photo</a>
+        </div>
+    </div>
+
+    <script>
+       
+        document.getElementById('fileInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('photo').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+       
+        function applyFilter(filter) {
+            document.getElementById('photo').className = filter;
+        }
+
+        document.getElementById('downloadBtn').addEventListener('click', function () {
+            const photo = document.getElementById('photo');
+
+          
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+          
+            canvas.width = photo.width;
+            canvas.height = photo.height;
+
+           
+            context.filter = getComputedStyle(photo).filter;
+            context.drawImage(photo, 0, 0, canvas.width, canvas.height);
+
+           
+            const link = document.getElementById('downloadBtn');
+            link.href = canvas.toDataURL('image/png');
+        });
+    </script>
+</body>
+
+</html>

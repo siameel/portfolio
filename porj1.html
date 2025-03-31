@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Countdown Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            width: 60%;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #333;
+        }
+        .event {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e9e9e9;
+            border-radius: 8px;
+        }
+        .time {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #007BFF;
+        }
+        #add-event {
+            margin-top: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upcoming Events Countdown ⌛</h1>
+        <div id="events"></div>
+        <div id="add-event">
+            <h3>Add Custom Event:</h3>
+            <input type="text" id="event-name" placeholder="Event Name">
+            <input type="date" id="event-date">
+            <button onclick="addCustomEvent()">Add Event</button>
+        </div>
+    </div>
+
+    <script>
+       
+        function getEvents() {
+            const now = new Date();
+            return [
+                { name: "Next Minute 🕒", date: new Date(now.getTime() + 60 * 1000) },
+                { name: "Next Hour 🕒", date: new Date(now.setMinutes(60, 0, 0)) },
+                { name: "Next Day 🌅", date: new Date(now.setHours(24, 0, 0, 0)) },
+                { name: "Next Month 📆", date: new Date(now.getFullYear(), now.getMonth() + 1, 1) },
+                { name: "Next Year 🎊", date: new Date(now.getFullYear() + 1, 0, 1) },
+                { name: "Sia's Next Birthday 🎀", date: new Date(now.getFullYear() + (now > new Date(now.getFullYear(), 5, 28) ? 1 : 0), 5, 28) },
+                { name: "India's Next General Election 🇮🇳", date: new Date(2029, 3, 1) },
+                { name: "Next Olympic Games 🥎🚴‍♀️🏀", date: new Date(2028, 6, 26) },
+                { name: "Halley's Comet Return 💫", date: new Date(2061, 6, 28) },
+                { name: "UN General Assembly 🌐", date: new Date(now.getFullYear() + (now > new Date(now.getFullYear(), 8, 1) ? 1 : 0), 8, 1) },
+                { name: "Maha Kumbh Mela 🕉️", date: new Date(2033, 0, 14) },
+                { name: "Coachella Festival 🎉", date: new Date(2025, 3, 11) }
+            ];
+        }
+        
+        let events = JSON.parse(localStorage.getItem('customEvents')) || getEvents();
+
+        function updateCountdowns() {
+            const eventContainer = document.getElementById('events');
+            eventContainer.innerHTML = '';
+
+            events.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            events.forEach((event, index) => {
+                const timeRemaining = getTimeRemaining(new Date(event.date));
+                if (timeRemaining === "Event has passed" && event.name === "Next Minute 🕒") {
+                    events[index].date = new Date(new Date().getTime() + 60 * 1000); // Reset next minute
+                }
+                eventContainer.innerHTML += `
+                    <div class="event">
+                        <h3>${event.name}</h3>
+                        <div class="time">${timeRemaining}</div>
+                    </div>
+                `;
+            });
+
+            localStorage.setItem('customEvents', JSON.stringify(events));
+        }
+
+        function getTimeRemaining(targetDate) {
+            const now = new Date();
+            const diff = targetDate - now;
+            if (diff <= 0) return "Event has passed";
+
+            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+            const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            return `${years}y ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        function addCustomEvent() {
+            const name = document.getElementById('event-name').value;
+            const date = document.getElementById('event-date').value;
+
+            if (name && date) {
+                events.push({ name: name, date: new Date(date) });
+                updateCountdowns();
+                alert('🎉 Event Added Successfully!');
+            } else {
+                alert('⚠️ Please enter a valid event name and date.');
+            }
+        }
+
+      
+        setInterval(updateCountdowns, 1000);
+    </script>
+</body>
+</html>

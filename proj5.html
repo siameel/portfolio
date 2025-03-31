@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandala Creator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        #canvas-container {
+            position: relative;
+            margin: 0 auto;
+            width: 80%;
+            height: 500px;
+        }
+
+        #mandala-canvas {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        #tools {
+            margin-top: 20px;
+        }
+
+        #color-picker,
+        #symmetry,
+        #brush-size {
+            margin: 10px 0;
+        }
+
+        #save-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mandala Creator</h1>
+    </header>
+
+    <main>
+        <div id="canvas-container">
+            <canvas id="mandala-canvas"></canvas>
+        </div>
+        
+        <div id="tools">
+            <div id="color-picker">
+                <label for="color">Choose Color: </label>
+                <input type="color" id="color" value="#000000">
+            </div>
+            <div id="symmetry">
+                <label for="symmetry-type">Symmetry Type: </label>
+                <select id="symmetry-type">
+                    <option value="4">4-fold</option>
+                    <option value="6">6-fold</option>
+                    <option value="8">8-fold</option>
+                </select>
+            </div>
+            <div id="brush-size">
+                <label for="brush-size">Brush Size: </label>
+                <input type="range" id="brush-size" min="1" max="10" value="5">
+            </div>
+            <button id="save-btn">Save Design</button>
+        </div>
+    </main>
+
+    <script>
+        
+        const canvas = document.getElementById('mandala-canvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('color');
+        const brushSizePicker = document.getElementById('brush-size');
+        const symmetryPicker = document.getElementById('symmetry-type');
+        const saveBtn = document.getElementById('save-btn');
+
+        let brushColor = colorPicker.value;
+        let brushSize = brushSizePicker.value;
+        let symmetry = parseInt(symmetryPicker.value);
+        let drawing = false;
+
+        
+        const canvasSize = 500;
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        let lastX = 0;
+        let lastY = 0;
+
+        
+        function drawSymmetricLine(x, y) {
+            const angleIncrement = (2 * Math.PI) / symmetry;
+
+        
+            for (let i = 0; i < symmetry; i++) {
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(i * angleIncrement);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = brushColor;
+                ctx.lineWidth = brushSize;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        
+        canvas.addEventListener('mousemove', function (e) {
+            if (drawing) {
+                let x = e.offsetX - centerX;
+                let y = e.offsetY - centerY;
+
+            
+                drawSymmetricLine(x, y);
+
+                lastX = x;
+                lastY = y;
+            }
+        });
+
+
+        canvas.addEventListener('mousedown', function (e) {
+            drawing = true;
+
+            lastX = e.offsetX - centerX;
+            lastY = e.offsetY - centerY;
+        });
+
+        canvas.addEventListener('mouseup', function () {
+            drawing = false;
+        });
+
+        
+        colorPicker.addEventListener('input', function () {
+            brushColor = colorPicker.value;
+        });
+
+        
+        brushSizePicker.addEventListener('input', function () {
+            brushSize = brushSizePicker.value;
+        });
+
+    
+        symmetryPicker.addEventListener('change', function () {
+            symmetry = parseInt(symmetryPicker.value);
+        });
+
+        
+        saveBtn.addEventListener('click', function () {
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = 'mandala.png';
+            link.click();
+        });
+    </script>
+</body>
+</html>

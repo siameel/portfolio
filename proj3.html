@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jigsaw Puzzle Maker 🧩</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            margin-top: 20px;
+            color: #333;
+        }
+        #puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 5px;
+            margin-top: 20px;
+            width: 420px;
+            height: 420px;
+        }
+        .puzzle-piece {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ccc;
+            background-size: 400px 400px;
+            cursor: grab;
+        }
+        #file-input {
+            margin-top: 10px;
+        }
+        #preview-container {
+            margin-top: 20px;
+        }
+        #preview {
+            width: 200px;
+            height: 200px;
+            border: 1px solid #ccc;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create Your Jigsaw Puzzle 🧩</h1>
+    <input type="file" id="file-input" accept="image/*">
+    <div id="preview-container">
+        <h3>Preview:</h3>
+        <div id="preview"></div>
+    </div>
+    <div id="puzzle-container"></div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const puzzleContainer = document.getElementById('puzzle-container');
+        const preview = document.getElementById('preview');
+        const rows = 4, cols = 4;
+        let pieces = [];
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    createPuzzle(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function createPuzzle(imageSrc) {
+            puzzleContainer.innerHTML = '';
+            pieces = [];
+
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const piece = document.createElement('div');
+                    piece.className = 'puzzle-piece';
+                    piece.style.backgroundImage = `url(${imageSrc})`;
+                    piece.style.backgroundPosition = `${-col * 100}px ${-row * 100}px`;
+                    piece.dataset.row = row;
+                    piece.dataset.col = col;
+                    piece.draggable = true;
+                    piece.addEventListener('dragstart', dragStart);
+                    piece.addEventListener('dragover', dragOver);
+                    piece.addEventListener('drop', drop);
+                    pieces.push(piece);
+                }
+            }
+
+            shufflePieces();
+        }
+
+        function shufflePieces() {
+            pieces.sort(() => Math.random() - 0.5);
+            pieces.forEach(piece => puzzleContainer.appendChild(piece));
+        }
+
+        let draggedPiece = null;
+
+        function dragStart(event) {
+            draggedPiece = event.target;
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const target = event.target;
+
+            if (target.className === 'puzzle-piece' && draggedPiece !== target) {
+                const draggedIndex = [...puzzleContainer.children].indexOf(draggedPiece);
+                const targetIndex = [...puzzleContainer.children].indexOf(target);
+                
+                puzzleContainer.insertBefore(draggedPiece, target);
+                puzzleContainer.insertBefore(target, puzzleContainer.children[draggedIndex]);
+                
+                checkIfSolved();
+            }
+        }
+
+        function checkIfSolved() {
+            const piecesArray = [...puzzleContainer.children];
+            const isSolved = piecesArray.every((piece, index) => {
+                const row = Math.floor(index / cols);
+                const col = index % cols;
+                return piece.dataset.row == row && piece.dataset.col == col;
+            });
+
+            if (isSolved) {
+                alert('Congratulations! You solved the puzzle!');
+            }
+        }
+    </script>
+</body>
+</html>
